@@ -217,13 +217,23 @@ def background_fragment_processing_task(filenames: List[str], user_id: str):
 async def serve_ui():
     with open("index.html", "r", encoding="utf-8") as f:
         return f.read()
+import hashlib
 
 @app.post("/login")
 async def log_user_in_anonymously(request: Request, data: dict):
     try:
-        res = supabase.auth.sign_in_anonymously()
-        request.session['user_id'] = res.user.id
-        request.session['user_email'] = data.get('username', 'Anonymous Student')
+        username = data.get('username', '').strip()
+        if not username:
+            raise HTTPException(status_code=400, detail="Please provide a username.")
+            
+        # Create a reliable, deterministic unique user ID out of the student's name
+        user_id_hash = hashlib.md5(username.lower().encode('utf-8')).hexdigest()
+        
+        # Inject directly into your secure FastAPI encrypted state cookies
+        request.session['user_id'] = f"usr_{user_id_hash}"
+        request.session['user_email'] = username
+        
+        print(f"🔒 Workspace opened locally for session: {username} ({f'usr_{user_id_hash}'})")
         return {"status": "success"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
