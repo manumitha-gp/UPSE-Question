@@ -20,9 +20,16 @@ app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key="UPSC_APP_SECURE_COOKIE_KEY_999")
 
 # Cloud Infrastructure Configurations
-SUPABASE_URL = "https://nkkprmkdnxcsstczttmz.supabase.co"
-SUPABASE_KEY = "sb_publishable_ehPr5Yj3TQuFpFRJshIbmQ_lnIGzsbS"
-MY_GEMINI_API_KEY = "AIzaSyDEMMScWI1e-Gd8qhILWGaTPif_dlUGWqw"
+# =====================================================================
+# !!! CONFIGURATION CREDENTIALS BLOCK !!!
+# =====================================================================
+import os
+
+SUPABASE_URL = os.getenv("SUPABASE_URL", "https://supabase.co")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY", "YOUR_LOCAL_FALLBACK_KEY")
+MY_GEMINI_API_KEY = os.getenv("MY_GEMINI_API_KEY", "YOUR_LOCAL_FALLBACK_KEY")
+# =====================================================================
+
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 ai_client = genai.Client(api_key=MY_GEMINI_API_KEY)
